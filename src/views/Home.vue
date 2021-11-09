@@ -82,7 +82,7 @@ export default {
                         formatter: '{b}',
                         position: 'right',
                         distance: 8,
-                        fontSize:10,
+                        fontSize:9,
                         show: true
                     },
                     emphasis: {
