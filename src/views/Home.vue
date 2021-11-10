@@ -8,11 +8,31 @@
 // import $ from 'jquery'
 import * as echarts from 'echarts';
 import world from '@/assets/custom.geo.json'
-echarts.registerMap('world',world)
+
+echarts.registerMap('world', world)
 
 export default {
     name: 'Home',
     mounted() {
+        // var allXY = [{
+        //     value: [107.20, 30.08],
+        // }]
+        function renderItem(params,api) {
+            var coords = [
+                [116.7, 39.53],
+                [103.73, 36.03],
+                [112.91, 27.87],
+                [120.65, 28.01],
+                [119.57, 39.95]
+            ];
+            console.log(params)
+            console.log(api)
+            return{
+                type:'line',
+                data: [coords],
+                smooth: true
+            }
+        }
         var myChart = echarts.init(document.getElementById('myChart'));
         var data = [                        //元素为对象的数组
             {name: '天津', value: 6},
@@ -58,7 +78,13 @@ export default {
                     emphasis: {
                         areaColor: "#2a333d"
                     }
-                }
+                },
+                // boundingCoords: [
+                //     // 定位左上角经纬度
+                //     [-180, 90],
+                //     // 定位右下角经纬度
+                //     [180, -90]
+                // ],
             },
             series: [{
                 name: '地点',
@@ -73,7 +99,7 @@ export default {
                 showEffectOn: 'render',
                 rippleEffect: {
                     brushType: 'stroke',
-                    number:3,
+                    number: 3,
                     scale: 4,
                 },
                 hoverAnimation: true,
@@ -82,7 +108,7 @@ export default {
                         formatter: '{b}',
                         position: 'right',
                         distance: 8,
-                        fontSize:9,
+                        fontSize: 9,
                         show: true
                     },
                     emphasis: {
@@ -97,6 +123,16 @@ export default {
                     }
                 },
                 zlevel: 1
+            }, {
+                type: 'custom',
+                coordinateSystem: 'geo',
+                renderItem: renderItem,
+                itemStyle: {
+                    opacity:1
+                },
+                // animation: false,
+                // silent: true,
+                data: [0],
             }
             ]
         };
