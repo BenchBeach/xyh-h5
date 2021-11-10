@@ -1,11 +1,13 @@
 <template>
     <div class="home">
-        <div id="myChart" :style="{width: '100vw', height: '100vh'}"></div>
+        <div id="myChart" :style="{width: '100vw', height: '100vh',}"></div>
+        <!--        <div id="myChart" :style="{width: '100vh', height: '100vw',}"></div>-->
+        <svg width="100vw" height="100vh" id="my-svg" style="z-index:100;pointer-events: none;"></svg>
     </div>
 </template>
 
 <script>
-// import $ from 'jquery'
+import CreatePath from '@/components/path/index.js'
 import * as echarts from 'echarts';
 import world from '@/assets/custom.geo.json'
 
@@ -14,25 +16,20 @@ echarts.registerMap('world', world)
 export default {
     name: 'Home',
     mounted() {
-        // var allXY = [{
-        //     value: [107.20, 30.08],
-        // }]
-        function renderItem(params,api) {
-            var coords = [
-                [116.7, 39.53],
-                [103.73, 36.03],
-                [112.91, 27.87],
-                [120.65, 28.01],
-                [119.57, 39.95]
-            ];
-            console.log(params)
-            console.log(api)
-            return{
-                type:'line',
-                data: [coords],
-                smooth: true
-            }
+        function renderItem(params, api) {
+            const [x1, y1] = [117.20, 39.08]
+            const [x2, y2] = [119.58, 31.48]
+            const start = api.coord([
+                Math.max(x1, -180),
+                Math.max(y1, -90)
+            ]);
+            const end = api.coord([
+                Math.min(x2, 180),
+                Math.min(y2, 90)
+            ]);
+            CreatePath(start,end,[x1,y1,x2,y2])
         }
+
         var myChart = echarts.init(document.getElementById('myChart'));
         var data = [                        //元素为对象的数组
             {name: '天津', value: 6},
@@ -68,7 +65,8 @@ export default {
                     }
                 },
                 roam: true,
-                zoom: 1,
+                center: [117.20, 39.08],
+                zoom: 9,
                 left: 0, top: 0, right: 0, bottom: 0,
                 itemStyle: {
                     normal: {
@@ -79,12 +77,6 @@ export default {
                         areaColor: "#2a333d"
                     }
                 },
-                // boundingCoords: [
-                //     // 定位左上角经纬度
-                //     [-180, 90],
-                //     // 定位右下角经纬度
-                //     [180, -90]
-                // ],
             },
             series: [{
                 name: '地点',
@@ -127,9 +119,6 @@ export default {
                 type: 'custom',
                 coordinateSystem: 'geo',
                 renderItem: renderItem,
-                itemStyle: {
-                    opacity:1
-                },
                 // animation: false,
                 // silent: true,
                 data: [0],
@@ -142,3 +131,22 @@ export default {
     methods: {}
 }
 </script>
+
+<style scoped lang="scss">
+.home {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    > svg{
+        position:absolute;
+        left:0;
+        top:0;
+    }
+    > div{
+        position:absolute;
+        left:0;
+        top:0;
+    }
+}
+
+</style>
