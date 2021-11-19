@@ -56,7 +56,6 @@ $ARROW_T: 1.8s;
 .logo {
     color:white;
     position: fixed;
-    top: 2%;
     opacity: 0;
     left: 8%;
     animation: shade-in $LOGO_T ease-in $START_DELAY+$BG_T+0.5s;
@@ -65,10 +64,10 @@ $ARROW_T: 1.8s;
     display: flex;
     flex-direction: row;
     > img:nth-child(1){
-        width: 10%;
+        width: 12%;
     }
     > img:nth-child(2){
-        width: 20%;
+        width: 24%;
         margin-left: -1%;
     }
 }

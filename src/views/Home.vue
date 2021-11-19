@@ -3,11 +3,12 @@
         <div id="myChart" :style="{width: '100vw', height: '100vh',}"></div>
         <!--        <div id="myChart" :style="{width: '100vh', height: '100vw',}"></div>-->
         <svg width="100vw" height="100vh" id="my-svg" style="z-index:100;pointer-events: none;"></svg>
+        <div ></div>
     </div>
 </template>
 
 <script>
-import CreatePath from '@/components/path/index.js'
+// import CreatePath from '@/components/path/index.js'
 import * as echarts from 'echarts';
 import world from '@/assets/custom.geo.json'
 
@@ -16,30 +17,63 @@ echarts.registerMap('world', world)
 export default {
     name: 'Home',
     mounted() {
-        function renderItem(params, api) {
-            const [x1, y1] = [117.20, 39.08]
-            const [x2, y2] = [119.58, 31.48]
-            const start = api.coord([
-                Math.max(x1, -180),
-                Math.max(y1, -90)
-            ]);
-            const end = api.coord([
-                Math.min(x2, 180),
-                Math.min(y2, 90)
-            ]);
-            CreatePath(start,end,[x1,y1,x2,y2])
-        }
-
-        var myChart = echarts.init(document.getElementById('myChart'));
+        const myLoc = [parseFloat(this.$route.query.lng), parseFloat(this.$route.query.lat)]
+        console.log(myLoc)
         var data = [                        //元素为对象的数组
-            {name: '天津', value: 6},
-            {name: '常州', value: 6},
+            {name: '天津', value: 12},
+            {name: '常州', value: 12},
         ];
-
+        // if(!(/天津/.test(this.$route.query.locationName)||/常州/.test(this.$route.query.locationName))){
+        //
+        // }
+        data.push({name: `您的位置:${this.$route.query.name}`, value: 12})
         var geoCoordMap = {                 //对象
             '天津': [117.20, 39.08],
             '常州': [119.58, 31.48],
         }
+        geoCoordMap[`您的位置:${this.$route.query.name}`] = myLoc
+        let myP = [{coords: [myLoc, [119.58, 31.48]]}]
+        let allXY = []
+        let allXYLOC=[]
+        for (let i = 0; i < 100; i++) {
+            let x = Math.random() * 180
+            let r = Math.random()
+            let r2 = Math.random()
+            if (r2 < 0.5) {
+                r2 = -1
+            } else {
+                r2 = 1
+            }
+            if (r < 0.5) {
+                r = -1
+            } else {
+                r = 1
+            }
+            let y = Math.random() * 90 * r
+            x = x * r2
+            allXYLOC.push([x, y])
+            allXY.push({coords: [[x, y], [119.58, 31.48]]})
+        }
+        setTimeout(() => {
+            allXY.push({coords: [[1, 1], [119.58, 31.48]]})
+        }, 2000)
+        // allXY.push(myLoc)
+        //eslint-disable-next-line
+        // function renderItem(params, api) {
+        //     const [x1, y1] = [api.value(0), api.value(1)]
+        //     const [x2, y2] = [119.58, 31.48]
+        //     const start = api.coord([
+        //         Math.max(x1, -180),
+        //         Math.max(y1, -90)
+        //     ]);
+        //     const end = api.coord([
+        //         Math.min(x2, 180),
+        //         Math.min(y2, 90)
+        //     ]);
+        //     CreatePath(start, end, [x1, y1, x2, y2])
+        // }
+
+        var myChart = echarts.init(document.getElementById('myChart'));
 
         var convertData = function (data) {
             var res = [];
@@ -65,8 +99,7 @@ export default {
                     }
                 },
                 roam: true,
-                center: [117.20, 39.08],
-                zoom: 9,
+                zoom: 1,
                 left: 0, top: 0, right: 0, bottom: 0,
                 itemStyle: {
                     normal: {
@@ -75,6 +108,9 @@ export default {
                     },
                     emphasis: {
                         areaColor: "#2a333d"
+                    },
+                    markLine: {
+                        symbolSize: 100
                     }
                 },
             },
@@ -100,7 +136,7 @@ export default {
                         formatter: '{b}',
                         position: 'right',
                         distance: 8,
-                        fontSize: 9,
+                        fontSize: 12,
                         show: true
                     },
                     emphasis: {
@@ -115,14 +151,68 @@ export default {
                     }
                 },
                 zlevel: 1
-            }, {
-                type: 'custom',
-                coordinateSystem: 'geo',
-                renderItem: renderItem,
-                // animation: false,
-                // silent: true,
-                data: [0],
-            }
+            },
+                //     {
+                //     type: 'custom',
+                //     coordinateSystem: 'geo',
+                //     renderItem: renderItem,
+                //     // animation: false,
+                //     // silent: true,
+                //     data: allXY,
+                // }
+                {
+                    type: 'lines',
+                    coordinateSystem: 'geo',
+                    zlevel: 1,
+                    cap: 'round',
+                    // large:true,
+                    lineStyle: {
+                        color: '#ffffff',
+                        opacity: 0.4,
+                        width: 1,
+                        curveness: 0.2,
+                    },
+                    // effect:{
+                    //   show: true,
+                    //     zlevel:2,
+                    //     loop:false
+                    // },
+                    data: allXY,
+                    animationThreshold: 10000,
+                    animationDuration: 8000,
+                    animationDurationUpdate: 800,
+                    animationDelay: 4000
+                },
+                {
+                    type: 'lines',
+                    coordinateSystem: 'geo',
+                    zlevel: 2,
+                    cap: 'round',
+                    lineStyle: {
+                        color: '#ffffff',
+                        opacity: 0.8,
+                        width: 4,
+                        curveness: 0.2,
+                    },
+                    data: myP,
+                    animationThreshold: 10000,
+                    animationDuration: 4000,
+                },{
+                    name: '小地点',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: allXYLOC,
+                    symbolSize: 3,
+                    // showEffectOn: 'render',
+                    itemStyle: {
+                        normal: {
+                            color: '#f4e925',
+                            shadowBlur: 8,
+                            shadowColor: '#333'
+                        }
+                    },
+                    zlevel: 1
+                }
             ]
         };
 
@@ -137,15 +227,17 @@ export default {
     width: 100vw;
     height: 100vh;
     position: absolute;
-    > svg{
-        position:absolute;
-        left:0;
-        top:0;
+
+    > svg {
+        position: absolute;
+        left: 0;
+        top: 0;
     }
-    > div{
-        position:absolute;
-        left:0;
-        top:0;
+
+    > div {
+        position: absolute;
+        left: 0;
+        top: 0;
     }
 }
 
